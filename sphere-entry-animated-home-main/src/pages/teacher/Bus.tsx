@@ -144,18 +144,30 @@ const Bus = () => {
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-4">
-            <Button onClick={() => navigate('/dashboard/teacher')} variant="outline" size="sm">
+            <Button
+              onClick={() => navigate('/dashboard/teacher')}
+              variant="outline"
+              className="px-3 py-2 text-xs sm:px-4 sm:py-2 sm:text-sm"
+            >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
             </Button>
             <h1 className="text-2xl font-bold text-gray-800">Bus Tracking</h1>
           </div>
           <div className="flex space-x-2">
-            <Button onClick={() => setShowAddStudentModal(true)} variant="default">
+            <Button
+              onClick={() => setShowAddStudentModal(true)}
+              variant="default"
+              className="px-3 py-2 text-xs sm:px-4 sm:py-2 sm:text-sm"
+            >
               <Users className="w-4 h-4 mr-2" />
               Add Student
             </Button>
-            <Button onClick={exportData} variant="outline">
+            <Button
+              onClick={exportData}
+              variant="outline"
+              className="px-3 py-2 text-xs sm:px-4 sm:py-2 sm:text-sm"
+            >
               <Download className="w-4 h-4 mr-2" />
               Export
             </Button>
@@ -276,11 +288,19 @@ const Bus = () => {
                         <TableCell>{item.vehicleNumber}</TableCell>
                         <TableCell className="text-center">
                           <div className="flex justify-center space-x-2">
-                            <Button size="sm" variant="outline" onClick={() => handleEdit(item, 'driver')}>
+                            <Button
+                              variant="outline"
+                              onClick={() => handleEdit(item, 'driver')}
+                              className="px-2 py-1 text-xs sm:px-3 sm:py-2 sm:text-sm"
+                            >
                               <Edit className="w-4 h-4 mr-1" />
                               Edit Driver
                             </Button>
-                            <Button size="sm" variant="destructive" onClick={() => handleDelete(item.id)}>
+                            <Button
+                              variant="destructive"
+                              onClick={() => handleDelete(item.id)}
+                              className="px-2 py-1 text-xs sm:px-3 sm:py-2 sm:text-sm"
+                            >
                               <Trash2 className="w-4 h-4 mr-1" />
                               Delete
                             </Button>
@@ -331,8 +351,17 @@ const Bus = () => {
                 </>
               ) : null}
               <div className="flex space-x-2">
-                <Button type="submit" className="flex-1">Update</Button>
-                <Button type="button" variant="outline" onClick={() => setShowEditModal(false)} className="flex-1">Cancel</Button>
+                <Button type="submit" className="flex-1 px-3 py-2 text-xs sm:px-4 sm:py-2 sm:text-sm">
+                  Update
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowEditModal(false)}
+                  className="flex-1 px-3 py-2 text-xs sm:px-4 sm:py-2 sm:text-sm"
+                >
+                  Cancel
+                </Button>
               </div>
             </form>
           </DialogContent>
