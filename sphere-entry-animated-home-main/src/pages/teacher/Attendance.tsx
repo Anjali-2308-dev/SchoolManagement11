@@ -110,23 +110,36 @@ const Attendance = () => {
   );
 
   return (
-    <div className="min-h-screen p-4 bg-gradient-to-br from-blue-50 to-purple-50">
+    <div className="min-h-screen p-2 sm:p-4 bg-gradient-to-br from-blue-50 to-purple-50">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-4">
-            <Button onClick={() => navigate('/dashboard/teacher')} variant="outline" size="sm">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+            <Button
+              onClick={() => navigate('/dashboard/teacher')}
+              variant="outline"
+              className="px-3 py-2 text-xs sm:px-4 sm:py-2 sm:text-sm"
+            >
               <ArrowLeft className="w-4 h-4 mr-2" /> Back to Dashboard
             </Button>
             <h1 className="text-2xl font-bold text-gray-800">Attendance Management</h1>
           </div>
-          <div className="flex space-x-2">
-            <Button onClick={() => setShowAddModal(true)} className="bg-blue-600 hover:bg-blue-700">
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button
+              onClick={() => setShowAddModal(true)}
+              className="w-full sm:w-auto px-3 py-2 text-xs sm:px-4 sm:py-2 sm:text-sm bg-blue-600 hover:bg-blue-700"
+            >
               <Plus className="w-4 h-4 mr-2" /> Add Student
             </Button>
-            <Button onClick={exportToCSV} className="bg-green-600 hover:bg-green-700">
+            <Button
+              onClick={exportToCSV}
+              className="w-full sm:w-auto px-3 py-2 text-xs sm:px-4 sm:py-2 sm:text-sm bg-green-600 hover:bg-green-700"
+            >
               <Download className="w-4 h-4 mr-2" /> Export CSV
             </Button>
-            <Button onClick={saveAttendance} className="bg-indigo-600 hover:bg-indigo-700">
+            <Button
+              onClick={saveAttendance}
+              className="w-full sm:w-auto px-3 py-2 text-xs sm:px-4 sm:py-2 sm:text-sm bg-indigo-600 hover:bg-indigo-700"
+            >
               <Save className="w-4 h-4 mr-2" /> Save Attendance
             </Button>
           </div>
@@ -138,7 +151,7 @@ const Attendance = () => {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <label className="block text-sm font-medium mb-2">Search Students</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
@@ -186,8 +199,8 @@ const Attendance = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
+            <div className="w-full overflow-x-auto">
+              <Table className="min-w-[600px]">
                 <TableHeader>
                   <TableRow>
                     <TableHead>Roll No</TableHead>
@@ -229,7 +242,7 @@ const Attendance = () => {
               </Table>
             </div>
             <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-              <div className="flex justify-between text-sm">
+              <div className="flex flex-col sm:flex-row justify-between text-sm gap-2">
                 <span>Total Students: {filteredStudents.length}</span>
                 <span>Present: {filteredStudents.filter((s) => s.present).length}</span>
                 <span>Absent: {filteredStudents.filter((s) => !s.present).length}</span>
