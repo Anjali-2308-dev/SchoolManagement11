@@ -53,8 +53,8 @@ const AddBusForm = ({ onClose }: AddBusFormProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/addbus', formData); // ✅ Your backend POST endpoint
-      onClose(); // Refresh data in parent
+      await axios.post('http://localhost:5000/addbus', formData); // ✅ Backend Endpoint
+      onClose(); // Close modal after submission
     } catch (err) {
       console.error('Error submitting form:', err);
     }
@@ -62,13 +62,15 @@ const AddBusForm = ({ onClose }: AddBusFormProps) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-      <Card className="w-full max-w-md h-[90vh] overflow-hidden bg-white shadow-lg">
+      <Card className="w-[90%] sm:w-[80%] md:w-[60%] lg:w-[40%] xl:w-[30%] 2xl:w-[25%] h-[95vh] md:h-[90vh] overflow-hidden bg-white shadow-lg rounded-xl">
         <CardHeader>
-          <CardTitle className="text-center text-lg">Add New Bus</CardTitle>
+          <CardTitle className="text-center text-lg md:text-xl lg:text-2xl">
+            Add New Bus
+          </CardTitle>
         </CardHeader>
 
-        <CardContent className="overflow-y-auto max-h-[70vh] pr-2">
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <CardContent className="overflow-y-auto max-h-[80vh] md:max-h-[70vh] pr-2">
+          <form onSubmit={handleSubmit} className="space-y-4 px-2 md:px-4">
             <div>
               <Label>Driver Name</Label>
               <Input
@@ -170,7 +172,10 @@ const AddBusForm = ({ onClose }: AddBusFormProps) => {
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancel
               </Button>
-              <Button type="submit" className="bg-emerald-600 text-white hover:bg-emerald-700">
+              <Button
+                type="submit"
+                className="bg-emerald-600 text-white hover:bg-emerald-700"
+              >
                 Add Bus
               </Button>
             </div>
