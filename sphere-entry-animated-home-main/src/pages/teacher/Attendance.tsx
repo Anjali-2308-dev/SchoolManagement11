@@ -10,19 +10,21 @@ import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@
 import axios from 'axios';
 import AddStudentModal from '@/components/AddStudentModal';
 
+const subjects = ['Math', 'Science', 'English', 'Social', 'Telugu']; // Add more if needed
+
 const Attendance = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedClass, setSelectedClass] = useState('10A');
+  const [selectedSubject, setSelectedSubject] = useState(subjects[0]); // Default first subject
   const [showAddModal, setShowAddModal] = useState(false);
   const [students, setStudents] = useState([]);
 
-  // Always fetch students when class or date changes, or after adding a student
-  const fetchStudents = async (cls, date) => {
+  const fetchStudents = async (cls, date, subject) => {
     try {
       const res = await axios.get('http://localhost:5000/students-with-attendance', {
-        params: { class: cls, date },
+        params: { class: cls, date, subject },
       });
       setStudents(res.data);
     } catch (err) {
@@ -31,10 +33,9 @@ const Attendance = () => {
     }
   };
 
-  // Fetch students on mount and whenever class/date changes
   useEffect(() => {
-    fetchStudents(selectedClass, selectedDate);
-  }, [selectedClass, selectedDate]);
+    fetchStudents(selectedClass, selectedDate, selectedSubject);
+  }, [selectedClass, selectedDate, selectedSubject]);
 
   const handleAttendanceChange = async (studentId, present) => {
     setStudents((prev) =>
@@ -47,6 +48,7 @@ const Attendance = () => {
       await axios.put(`http://localhost:5000/attendance/${studentId}`, {
         present,
         date: selectedDate,
+        subject: selectedSubject,
       });
     } catch (err) {
       console.error('Error updating attendance:', err);
@@ -59,9 +61,9 @@ const Attendance = () => {
       await axios.post('http://localhost:5000/attendance', {
         ...newStudent,
         date: selectedDate,
+        subject: selectedSubject,
       });
-      // Refetch students after adding
-      fetchStudents(selectedClass, selectedDate);
+      fetchStudents(selectedClass, selectedDate, selectedSubject);
       setShowAddModal(false);
     } catch (error) {
       console.error('Error adding student:', error);
@@ -76,11 +78,12 @@ const Attendance = () => {
         'Roll No': student.rollNo,
         Name: student.name,
         Class: student.class,
+        Subject: selectedSubject,
         Status: student.present ? 'Present' : 'Absent',
         Date: selectedDate,
       }));
     console.log('Exporting CSV:', csvData);
-    // Use a library like PapaParse or file-saver for actual export
+    // Integrate actual CSV export logic here.
   };
 
   const saveAttendance = async () => {
@@ -90,10 +93,11 @@ const Attendance = () => {
         .map((student) => ({
           studentId: student._id,
           date: selectedDate,
+          subject: selectedSubject,
           present: student.present,
         }));
 
-      const res = await axios.post('http://localhost:5000/attendance/:', payload);
+      const res = await axios.post('http://localhost:5000/attendance/save-period-attendance', payload);
       console.log('Saved attendance:', res.data);
       alert('Attendance saved successfully!');
     } catch (error) {
@@ -189,13 +193,26 @@ const Attendance = () => {
                 </Select>
               </div>
             </div>
+            {/* Subjects Selector */}
+            <div className="flex flex-wrap mt-4 gap-2">
+              {subjects.map((subject) => (
+                <Button
+                  key={subject}
+                  variant={selectedSubject === subject ? 'default' : 'outline'}
+                  className="text-xs sm:text-sm"
+                  onClick={() => setSelectedSubject(subject)}
+                >
+                  {subject}
+                </Button>
+              ))}
+            </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
             <CardTitle>
-              Class {selectedClass} - {selectedDate}
+              {selectedClass} - {selectedDate} - {selectedSubject}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -214,7 +231,7 @@ const Attendance = () => {
                   {filteredStudents.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={5} className="text-center text-gray-500">
-                        No students found for class {selectedClass}
+                        No students found for {selectedSubject}
                       </TableCell>
                     </TableRow>
                   ) : (
