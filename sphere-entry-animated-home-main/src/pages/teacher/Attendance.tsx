@@ -9,15 +9,17 @@ import { ArrowLeft, Download, Search, Calendar, Plus, Save } from 'lucide-react'
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import axios from 'axios';
 import AddStudentModal from '@/components/AddStudentModal';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const subjects = ['Math', 'Science', 'English', 'Social', 'Telugu']; // Add more if needed
+const subjects = ['Math', 'Science', 'English', 'Social', 'Telugu'];
 
 const Attendance = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedClass, setSelectedClass] = useState('10A');
-  const [selectedSubject, setSelectedSubject] = useState(subjects[0]); // Default first subject
+  const [selectedSubject, setSelectedSubject] = useState(subjects[0]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [students, setStudents] = useState([]);
 
@@ -29,7 +31,8 @@ const Attendance = () => {
       setStudents(res.data);
     } catch (err) {
       console.error('Error fetching students:', err);
-      setStudents([]); // Clear students on error
+      toast.error('Failed to fetch students');
+      setStudents([]);
     }
   };
 
@@ -50,9 +53,10 @@ const Attendance = () => {
         date: selectedDate,
         subject: selectedSubject,
       });
+      toast.success('Attendance updated successfully');
     } catch (err) {
       console.error('Error updating attendance:', err);
-      alert('Failed to update attendance in DB.');
+      toast.error('Failed to update attendance');
     }
   };
 
@@ -65,9 +69,10 @@ const Attendance = () => {
       });
       fetchStudents(selectedClass, selectedDate, selectedSubject);
       setShowAddModal(false);
+      toast.success('Student added successfully');
     } catch (error) {
       console.error('Error adding student:', error);
-      alert('Failed to add student');
+      toast.error('Failed to add student');
     }
   };
 
@@ -83,7 +88,7 @@ const Attendance = () => {
         Date: selectedDate,
       }));
     console.log('Exporting CSV:', csvData);
-    // Integrate actual CSV export logic here.
+    toast.info('CSV export feature coming soon');
   };
 
   const saveAttendance = async () => {
@@ -99,10 +104,10 @@ const Attendance = () => {
 
       const res = await axios.post('http://localhost:5000/attendance/save-period-attendance', payload);
       console.log('Saved attendance:', res.data);
-      alert('Attendance saved successfully!');
+      toast.success('Attendance saved successfully');
     } catch (error) {
       console.error('Error saving attendance:', error);
-      alert('Failed to save attendance.');
+      toast.error('Failed to save attendance');
     }
   };
 
@@ -115,7 +120,9 @@ const Attendance = () => {
 
   return (
     <div className="min-h-screen p-2 sm:p-4 bg-gradient-to-br from-blue-50 to-purple-50">
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
       <div className="max-w-6xl mx-auto">
+        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
             <Button
@@ -149,6 +156,7 @@ const Attendance = () => {
           </div>
         </div>
 
+        {/* Attendance Controls */}
         <Card className="mb-6">
           <CardHeader>
             <CardTitle>Attendance Controls</CardTitle>
@@ -193,7 +201,8 @@ const Attendance = () => {
                 </Select>
               </div>
             </div>
-            {/* Subjects Selector */}
+
+            {/* Subject Selector */}
             <div className="flex flex-wrap mt-4 gap-2">
               {subjects.map((subject) => (
                 <Button
@@ -209,6 +218,7 @@ const Attendance = () => {
           </CardContent>
         </Card>
 
+        {/* Attendance Table */}
         <Card>
           <CardHeader>
             <CardTitle>
@@ -258,6 +268,8 @@ const Attendance = () => {
                 </TableBody>
               </Table>
             </div>
+
+            {/* Summary */}
             <div className="mt-4 p-4 bg-gray-50 rounded-lg">
               <div className="flex flex-col sm:flex-row justify-between text-sm gap-2">
                 <span>Total Students: {filteredStudents.length}</span>
@@ -268,6 +280,7 @@ const Attendance = () => {
           </CardContent>
         </Card>
 
+        {/* Add Student Modal */}
         <AddStudentModal
           isOpen={showAddModal}
           onClose={() => setShowAddModal(false)}
