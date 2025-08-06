@@ -87,16 +87,24 @@ const Notifications = () => {
     <div className="min-h-screen p-4 bg-gradient-to-br from-violet-50 to-purple-50">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-4">
-            <Button onClick={() => navigate('/dashboard/teacher')} variant="outline" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 space-y-4 sm:space-y-0">
+          <div className="flex items-center space-x-2 w-full sm:w-auto">
+            <Button
+              onClick={() => navigate('/dashboard/teacher')}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-x-1 px-2 sm:px-4 py-1 sm:py-2 h-8 sm:h-10 text-sm sm:text-base w-auto"
+            >
+              <ArrowLeft className="w-4 h-4" />
               Back to Dashboard
             </Button>
-            <h1 className="text-2xl font-bold text-gray-800">School Notifications</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-800">School Notifications</h1>
           </div>
-          <Button onClick={() => setShowAddForm(true)} className="bg-violet-600 hover:bg-violet-700">
-            <Plus className="w-4 h-4 mr-2" />
+          <Button
+            onClick={() => setShowAddForm(true)}
+            className="bg-violet-600 hover:bg-violet-700 flex items-center gap-x-1 px-2 sm:px-4 py-1 sm:py-2 h-8 sm:h-10 text-sm sm:text-base w-auto"
+          >
+            <Plus className="w-4 h-4" />
             Send Notification
           </Button>
         </div>
@@ -105,7 +113,9 @@ const Notifications = () => {
         {showAddForm && (
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>{editingId ? 'Edit Notification' : 'Compose New Notification'}</CardTitle>
+              <CardTitle className="text-base sm:text-lg">
+                {editingId ? 'Edit Notification' : 'Compose New Notification'}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -163,21 +173,29 @@ const Notifications = () => {
                   </select>
                 </div>
 
-                <div className="flex space-x-2">
-                  <Button type="submit" className="bg-green-600 hover:bg-green-700">
-                    <Send className="w-4 h-4 mr-2" />
+                <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
+                  <Button
+                    type="submit"
+                    className="bg-green-600 hover:bg-green-700 flex items-center gap-x-1 px-2 sm:px-4 py-1 sm:py-2 h-8 sm:h-10 text-sm sm:text-base w-auto"
+                  >
+                    <Send className="w-4 h-4" />
                     {editingId ? 'Update Notification' : 'Send Notification'}
                   </Button>
-                  <Button type="button" variant="outline" onClick={() => {
-                    setShowAddForm(false);
-                    setFormData({
-                      title: '',
-                      message: '',
-                      audience: '',
-                      deliveryMethod: 'App',
-                    });
-                    setEditingId(null);
-                  }}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setShowAddForm(false);
+                      setFormData({
+                        title: '',
+                        message: '',
+                        audience: '',
+                        deliveryMethod: 'App',
+                      });
+                      setEditingId(null);
+                    }}
+                    className="flex items-center gap-x-1 px-2 sm:px-4 py-1 sm:py-2 h-8 sm:h-10 text-sm sm:text-base w-auto"
+                  >
                     Cancel
                   </Button>
                 </div>
@@ -189,11 +207,11 @@ const Notifications = () => {
         {/* Table */}
         <Card>
           <CardHeader>
-            <CardTitle>Notification History</CardTitle>
+            <CardTitle className="text-base sm:text-lg">Notification History</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
-              <Table>
+              <Table className="min-w-[640px] sm:min-w-full">
                 <TableHeader>
                   <TableRow>
                     <TableHead>Title</TableHead>
