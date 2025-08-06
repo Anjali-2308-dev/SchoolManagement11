@@ -11,7 +11,6 @@ import axios from 'axios';
 const Projects = () => {
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
-
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
@@ -84,16 +83,24 @@ const Projects = () => {
   return (
     <div className="min-h-screen p-4 bg-gradient-to-br from-pink-50 to-rose-50">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-4">
-            <Button onClick={() => navigate('/dashboard/teacher')} variant="outline" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 space-y-4 sm:space-y-0">
+          <div className="flex items-center space-x-2 w-full sm:w-auto">
+            <Button
+              onClick={() => navigate('/dashboard/teacher')}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-x-1 px-2 sm:px-4 py-1 sm:py-2 h-8 sm:h-10 text-sm sm:text-base w-auto"
+            >
+              <ArrowLeft className="w-4 h-4" />
               Back to Dashboard
             </Button>
-            <h1 className="text-2xl font-bold text-gray-800">Project Management</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Project Management</h1>
           </div>
-          <Button onClick={() => setShowAddForm(true)} className="bg-pink-600 hover:bg-pink-700">
-            <Plus className="w-4 h-4 mr-2" />
+          <Button
+            onClick={() => setShowAddForm(true)}
+            className="bg-pink-600 hover:bg-pink-700 flex items-center gap-x-1 px-2 sm:px-4 py-1 sm:py-2 h-8 sm:h-10 text-sm sm:text-base w-auto"
+          >
+            <Plus className="w-4 h-4" />
             Assign Project
           </Button>
         </div>
@@ -153,9 +160,12 @@ const Projects = () => {
                     required
                   />
                 </div>
-                <div className="flex space-x-2">
-                  <Button type="submit" className="bg-green-600 hover:bg-green-700">
-                    {editingId ? 'Update' : 'Assign'} Project
+                <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
+                  <Button
+                    type="submit"
+                    className="bg-green-600 hover:bg-green-700 flex items-center gap-x-1 px-2 sm:px-4 py-1 sm:py-2 h-8 sm:h-10 text-sm sm:text-base w-auto"
+                  >
+                    {editingId ? 'Update Project' : 'Assign Project'}
                   </Button>
                   <Button
                     type="button"
@@ -165,6 +175,7 @@ const Projects = () => {
                       setEditingId(null);
                       setFormData({ title: '', class: '', subject: '', dueDate: '', description: '' });
                     }}
+                    className="flex items-center gap-x-1 px-2 sm:px-4 py-1 sm:py-2 h-8 sm:h-10 text-sm sm:text-base w-auto"
                   >
                     Cancel
                   </Button>
@@ -180,7 +191,7 @@ const Projects = () => {
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
-              <Table>
+              <Table className="min-w-[640px] sm:min-w-full">
                 <TableHeader>
                   <TableRow>
                     <TableHead>Project Title</TableHead>
