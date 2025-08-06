@@ -10,6 +10,8 @@ import { Label } from '@/components/ui/label';
 import { ArrowLeft, MapPin, Phone, Edit, Users, Download, Trash2 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import AddBusStudentModal from '@/components/AddBusStudentModal';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Bus = () => {
   const navigate = useNavigate();
@@ -18,14 +20,14 @@ const Bus = () => {
   const [selectedRoute, setSelectedRoute] = useState('all');
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddStudentModal, setShowAddStudentModal] = useState(false);
-  const [editingItem, setEditingItem] = useState<any>(null);
-  const [editType, setEditType] = useState<'driver' | 'student'>('driver');
+  const [editingItem, setEditingItem] = useState(null);
+  const [editType, setEditType] = useState('driver');
   const [formData, setFormData] = useState({
     driverName: '',
     phoneNumber: '',
     vehicleNumber: '',
     studentName: '',
-    pickupPoint: ''
+    pickupPoint: '',
   });
 
   const [busData, setBusData] = useState([
@@ -39,7 +41,7 @@ const Bus = () => {
       pickupPoint: 'Main Street Stop 1',
       driverName: 'John Smith',
       phoneNumber: '9876543210',
-      vehicleNumber: 'TN-01-AB-1234'
+      vehicleNumber: 'TN-01-AB-1234',
     },
     {
       id: 2,
@@ -51,7 +53,7 @@ const Bus = () => {
       pickupPoint: 'Main Street Stop 2',
       driverName: 'John Smith',
       phoneNumber: '9876543210',
-      vehicleNumber: 'TN-01-AB-1234'
+      vehicleNumber: 'TN-01-AB-1234',
     },
     {
       id: 3,
@@ -63,8 +65,8 @@ const Bus = () => {
       pickupPoint: 'Park Avenue Stop 1',
       driverName: 'Mike Johnson',
       phoneNumber: '9876543211',
-      vehicleNumber: 'TN-01-CD-5678'
-    }
+      vehicleNumber: 'TN-01-CD-5678',
+    },
   ]);
 
   const students = [
@@ -72,14 +74,14 @@ const Bus = () => {
     { id: 'S002', name: 'Bob Smith', class: '9B' },
     { id: 'S003', name: 'Carol Davis', class: '10B' },
     { id: 'S004', name: 'David Wilson', class: '9A' },
-    { id: 'S005', name: 'Emma Brown', class: '10A' }
+    { id: 'S005', name: 'Emma Brown', class: '10A' },
   ];
 
   const classes = ['9A', '9B', '10A', '10B', '10C'];
   const routes = ['R001', 'R002', 'R003'];
 
   const getFilteredData = () => {
-    return busData.filter(item => {
+    return busData.filter((item) => {
       const studentMatch = selectedStudent === 'all' || item.studentId === selectedStudent;
       const classMatch = selectedClass === 'all' || item.class === selectedClass;
       const routeMatch = selectedRoute === 'all' || item.routeId === selectedRoute;
@@ -89,7 +91,7 @@ const Bus = () => {
 
   const filteredData = getFilteredData();
 
-  const handleEdit = (item: any, type: 'driver' | 'student') => {
+  const handleEdit = (item, type) => {
     setEditingItem(item);
     setEditType(type);
     setFormData({
@@ -97,68 +99,76 @@ const Bus = () => {
       phoneNumber: type === 'driver' ? item.phoneNumber : '',
       vehicleNumber: type === 'driver' ? item.vehicleNumber : '',
       studentName: type === 'student' ? item.studentName : '',
-      pickupPoint: type === 'student' ? item.pickupPoint : ''
+      pickupPoint: type === 'student' ? item.pickupPoint : '',
     });
     setShowEditModal(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Updated data:', formData);
+    toast.success(`${editType === 'driver' ? 'Driver' : 'Student'} details updated successfully`);
     setShowEditModal(false);
     setEditingItem(null);
   };
 
-  const handleAddStudent = (student: any) => {
-    console.log('Adding student:', student);
+  const handleAddStudent = (student) => {
+    setBusData((prev) => [...prev, student]);
+    toast.success('Student added successfully');
   };
 
-  const handleDelete = (id: number) => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this entry?');
-    if (confirmDelete) {
-      const updated = busData.filter(item => item.id !== id);
-      setBusData(updated);
-    }
+  const handleDelete = (id) => {
+    const updated = busData.filter((item) => item.id !== id);
+    setBusData(updated);
+    toast.info('Entry deleted successfully');
   };
 
   const exportData = () => {
-    const exportData = filteredData.map(item => ({
+    if (filteredData.length === 0) {
+      toast.warning('No data available to export');
+      return;
+    }
+
+    const exportData = filteredData.map((item) => ({
       'Student Name': item.studentName,
-      'Class': item.class,
+      Class: item.class,
       'Route ID': item.routeId,
       'Route Name': item.routeName,
       'Pickup Point': item.pickupPoint,
       'Driver Name': item.driverName,
       'Phone Number': item.phoneNumber,
-      'Vehicle Number': item.vehicleNumber
+      'Vehicle Number': item.vehicleNumber,
     }));
 
     const ws = XLSX.utils.json_to_sheet(exportData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Bus Tracking Data');
     XLSX.writeFile(wb, 'bus_tracking_data.xlsx');
+
+    toast.success('Bus tracking data exported successfully');
   };
 
   return (
     <div className="min-h-screen p-4 bg-gradient-to-br from-cyan-50 to-blue-50">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+      <div className="max-w-6xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center space-x-4">
             <Button
               onClick={() => navigate('/dashboard/teacher')}
               variant="outline"
-              className="px-3 py-2 text-xs sm:px-4 sm:py-2 sm:text-sm"
+              className="px-3 py-2 text-sm"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
             </Button>
             <h1 className="text-2xl font-bold text-gray-800">Bus Tracking</h1>
           </div>
-          <div className="flex space-x-2">
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <Button
               onClick={() => setShowAddStudentModal(true)}
               variant="default"
-              className="px-3 py-2 text-xs sm:px-4 sm:py-2 sm:text-sm"
+              className="w-full sm:w-auto"
             >
               <Users className="w-4 h-4 mr-2" />
               Add Student
@@ -166,7 +176,7 @@ const Bus = () => {
             <Button
               onClick={exportData}
               variant="outline"
-              className="px-3 py-2 text-xs sm:px-4 sm:py-2 sm:text-sm"
+              className="w-full sm:w-auto"
             >
               <Download className="w-4 h-4 mr-2" />
               Export
@@ -174,7 +184,8 @@ const Bus = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        {/* Filters */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           <div>
             <Label>Select Student</Label>
             <Select value={selectedStudent} onValueChange={setSelectedStudent}>
@@ -183,7 +194,7 @@ const Bus = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Students</SelectItem>
-                {students.map(student => (
+                {students.map((student) => (
                   <SelectItem key={student.id} value={student.id}>
                     {student.name} ({student.id})
                   </SelectItem>
@@ -191,7 +202,6 @@ const Bus = () => {
               </SelectContent>
             </Select>
           </div>
-
           <div>
             <Label>Select Class</Label>
             <Select value={selectedClass} onValueChange={setSelectedClass}>
@@ -200,13 +210,14 @@ const Bus = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Classes</SelectItem>
-                {classes.map(cls => (
-                  <SelectItem key={cls} value={cls}>{cls}</SelectItem>
+                {classes.map((cls) => (
+                  <SelectItem key={cls} value={cls}>
+                    {cls}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-
           <div>
             <Label>Select Route</Label>
             <Select value={selectedRoute} onValueChange={setSelectedRoute}>
@@ -215,15 +226,18 @@ const Bus = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Routes</SelectItem>
-                {routes.map(route => (
-                  <SelectItem key={route} value={route}>{route}</SelectItem>
+                {routes.map((route) => (
+                  <SelectItem key={route} value={route}>
+                    {route}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        {/* Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm text-gray-600">Total Results</CardTitle>
@@ -237,7 +251,9 @@ const Bus = () => {
               <CardTitle className="text-sm text-gray-600">Active Routes</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{new Set(filteredData.map(item => item.routeId)).size}</div>
+              <div className="text-2xl font-bold text-green-600">
+                {new Set(filteredData.map((item) => item.routeId)).size}
+              </div>
             </CardContent>
           </Card>
           <Card>
@@ -245,28 +261,31 @@ const Bus = () => {
               <CardTitle className="text-sm text-gray-600">Students</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-purple-600">{new Set(filteredData.map(item => item.studentId)).size}</div>
+              <div className="text-2xl font-bold text-purple-600">
+                {new Set(filteredData.map((item) => item.studentId)).size}
+              </div>
             </CardContent>
           </Card>
         </div>
 
+        {/* Table */}
         <Card>
           <CardHeader>
             <CardTitle>Bus Tracking Results</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
-              <Table>
+              <Table className="min-w-full text-xs sm:text-sm">
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Student Name</TableHead>
-                    <TableHead>Class</TableHead>
-                    <TableHead>Route</TableHead>
-                    <TableHead>Pickup Point</TableHead>
-                    <TableHead>Driver Name</TableHead>
-                    <TableHead>Phone</TableHead>
-                    <TableHead>Vehicle</TableHead>
-                    <TableHead className="text-center">Actions</TableHead>
+                    <TableHead className="whitespace-nowrap">Student Name</TableHead>
+                    <TableHead className="whitespace-nowrap">Class</TableHead>
+                    <TableHead className="whitespace-nowrap">Route</TableHead>
+                    <TableHead className="whitespace-nowrap">Pickup Point</TableHead>
+                    <TableHead className="whitespace-nowrap">Driver Name</TableHead>
+                    <TableHead className="whitespace-nowrap">Phone</TableHead>
+                    <TableHead className="whitespace-nowrap">Vehicle</TableHead>
+                    <TableHead className="text-center whitespace-nowrap">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -277,29 +296,33 @@ const Bus = () => {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredData.map(item => (
+                    filteredData.map((item) => (
                       <TableRow key={item.id}>
-                        <TableCell>{item.studentName}</TableCell>
+                        <TableCell className="break-words">{item.studentName}</TableCell>
                         <TableCell>{item.class}</TableCell>
-                        <TableCell><div className="flex items-center"><MapPin className="w-4 h-4 mr-2" />{item.routeName}</div></TableCell>
-                        <TableCell>{item.pickupPoint}</TableCell>
-                        <TableCell>{item.driverName}</TableCell>
-                        <TableCell><div className="flex items-center"><Phone className="w-4 h-4 mr-2" />{item.phoneNumber}</div></TableCell>
-                        <TableCell>{item.vehicleNumber}</TableCell>
+                        <TableCell className="break-words flex items-center">
+                          <MapPin className="w-4 h-4 mr-1" /> {item.routeName}
+                        </TableCell>
+                        <TableCell className="break-words">{item.pickupPoint}</TableCell>
+                        <TableCell className="break-words">{item.driverName}</TableCell>
+                        <TableCell className="break-words flex items-center">
+                          <Phone className="w-4 h-4 mr-1" /> {item.phoneNumber}
+                        </TableCell>
+                        <TableCell className="break-words">{item.vehicleNumber}</TableCell>
                         <TableCell className="text-center">
-                          <div className="flex justify-center space-x-2">
+                          <div className="flex flex-col sm:flex-row justify-center gap-2">
                             <Button
                               variant="outline"
+                              size="sm"
                               onClick={() => handleEdit(item, 'driver')}
-                              className="px-2 py-1 text-xs sm:px-3 sm:py-2 sm:text-sm"
                             >
                               <Edit className="w-4 h-4 mr-1" />
-                              Edit Driver
+                              Edit
                             </Button>
                             <Button
                               variant="destructive"
+                              size="sm"
                               onClick={() => handleDelete(item.id)}
-                              className="px-2 py-1 text-xs sm:px-3 sm:py-2 sm:text-sm"
                             >
                               <Trash2 className="w-4 h-4 mr-1" />
                               Delete
@@ -315,13 +338,14 @@ const Bus = () => {
           </CardContent>
         </Card>
 
+        {/* Edit Dialog */}
         <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Edit {editType === 'driver' ? 'Driver' : 'Student'} Details</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {editType === 'driver' ? (
+              {editType === 'driver' && (
                 <>
                   <div>
                     <Label>Driver Name *</Label>
@@ -349,16 +373,16 @@ const Bus = () => {
                     />
                   </div>
                 </>
-              ) : null}
+              )}
               <div className="flex space-x-2">
-                <Button type="submit" className="flex-1 px-3 py-2 text-xs sm:px-4 sm:py-2 sm:text-sm">
+                <Button type="submit" className="flex-1">
                   Update
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setShowEditModal(false)}
-                  className="flex-1 px-3 py-2 text-xs sm:px-4 sm:py-2 sm:text-sm"
+                  className="flex-1"
                 >
                   Cancel
                 </Button>
@@ -367,6 +391,7 @@ const Bus = () => {
           </DialogContent>
         </Dialog>
 
+        {/* Add Student Modal */}
         <AddBusStudentModal
           isOpen={showAddStudentModal}
           onClose={() => setShowAddStudentModal(false)}
