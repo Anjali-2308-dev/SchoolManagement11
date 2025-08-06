@@ -6,12 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ArrowLeft, Plus, Trophy, Trash2, Upload, Download } from 'lucide-react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Achievements = () => {
   const navigate = useNavigate();
   const [achievements, setAchievements] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({
     student: '',
@@ -27,11 +28,11 @@ const Achievements = () => {
       setLoading(true);
       try {
         const response = await fetch('http://localhost:5000/achievements');
-        if (!response.ok) throw new Error('Failed to fetch');
+        if (!response.ok) throw new Error('Failed to fetch achievements');
         const data = await response.json();
         setAchievements(data);
       } catch (err) {
-        setError(err.message);
+        toast.error(err.message);
       } finally {
         setLoading(false);
       }
@@ -41,15 +42,13 @@ const Achievements = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
     if (!selectedFile) {
-      setError('Please upload a file (image or PDF)');
+      toast.warn('Please upload a file (image or PDF)');
       return;
     }
+
     const formDataToSend = new FormData();
-    Object.keys(formData).forEach((key) => {
-      formDataToSend.append(key, formData[key]);
-    });
+    Object.keys(formData).forEach((key) => formDataToSend.append(key, formData[key]));
     formDataToSend.append('file', selectedFile);
 
     try {
@@ -57,17 +56,20 @@ const Achievements = () => {
         method: 'POST',
         body: formDataToSend,
       });
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to create achievement');
       }
+
       const newAchievement = await response.json();
       setAchievements(prev => [newAchievement, ...prev]);
       setShowAddForm(false);
       setFormData({ student: '', title: '', category: '', date: '', description: '' });
       setSelectedFile(null);
+      toast.success('Achievement added successfully');
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
     }
   };
 
@@ -77,8 +79,9 @@ const Achievements = () => {
       const response = await fetch(`http://localhost:5000/achievements/${id}`, { method: 'DELETE' });
       if (!response.ok) throw new Error('Failed to delete achievement');
       setAchievements(prev => prev.filter(a => a._id !== id));
+      toast.success('Achievement deleted successfully');
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
     }
   };
 
@@ -93,19 +96,20 @@ const Achievements = () => {
 
   return (
     <div className="min-h-screen p-4 bg-gradient-to-br from-yellow-50 to-orange-50">
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
       <div className="max-w-7xl mx-auto">
         {/* HEADER Section */}
-       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-  <Button
-    onClick={() => navigate('/dashboard/teacher')}
-    variant="outline"
-    size="sm"
-    className="w-fit self-start sm:w-auto sm:self-center text-sm px-3 py-2"
-  >
-    <ArrowLeft className="w-4 h-4 mr-2" />
-    Back to Dashboard
-  </Button>
-<h1 className="text-xl sm:text-2xl font-bold text-gray-800 text-center sm:text-left">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <Button
+            onClick={() => navigate('/dashboard/teacher')}
+            variant="outline"
+            size="sm"
+            className="w-fit self-start sm:w-auto text-sm px-3 py-2"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Dashboard
+          </Button>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800 text-center sm:text-left">
             Student Achievements
           </h1>
           <Button
@@ -116,14 +120,6 @@ const Achievements = () => {
             Add Achievement
           </Button>
         </div>
-
-        {/* Error Alert */}
-        {error && (
-          <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded relative">
-            {error}
-            <button className="absolute top-2 right-4 font-bold" onClick={() => setError(null)}>×</button>
-          </div>
-        )}
 
         {/* Add Form */}
         {showAddForm && (
@@ -164,9 +160,9 @@ const Achievements = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="file">Upload File (Image/PDF)</Label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 md:p-6 text-center">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
                     <Label htmlFor="file-upload" className="cursor-pointer">
-                      <Upload className="mx-auto h-10 w-10 md:h-12 md:w-12 text-gray-400" />
+                      <Upload className="mx-auto h-10 w-10 text-gray-400" />
                       <p className="mt-2 text-sm text-gray-600">Click to upload image or certificate</p>
                       <p className="text-xs text-gray-500">JPG, PNG, PDF files accepted (max 10MB)</p>
                       {selectedFile && (
@@ -188,7 +184,16 @@ const Achievements = () => {
                   <Button type="submit" className="bg-green-600 hover:bg-green-700 w-full md:w-auto">
                     Save Achievement
                   </Button>
-                  <Button type="button" variant="outline" className="w-full md:w-auto" onClick={() => { setShowAddForm(false); setError(null); }}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full md:w-auto"
+                    onClick={() => {
+                      setShowAddForm(false);
+                      setFormData({ student: '', title: '', category: '', date: '', description: '' });
+                      setSelectedFile(null);
+                    }}
+                  >
                     Cancel
                   </Button>
                 </div>
@@ -218,7 +223,7 @@ const Achievements = () => {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <Table className="min-w-full">
+                <Table className="min-w-full text-sm">
                   <TableHeader>
                     <TableRow>
                       <TableHead>Student</TableHead>
@@ -240,11 +245,15 @@ const Achievements = () => {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <span className={`px-2 py-1 rounded text-xs ${
-                            achievement.category === 'Academic' ? 'bg-blue-100 text-blue-800' :
-                            achievement.category === 'Sports' ? 'bg-green-100 text-green-800' :
-                            'bg-purple-100 text-purple-800'
-                          }`}>
+                          <span
+                            className={`px-2 py-1 rounded text-xs ${
+                              achievement.category === 'Academic'
+                                ? 'bg-blue-100 text-blue-800'
+                                : achievement.category === 'Sports'
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-purple-100 text-purple-800'
+                            }`}
+                          >
                             {achievement.category}
                           </span>
                         </TableCell>
